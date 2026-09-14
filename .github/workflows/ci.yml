@@ -41,5 +41,9 @@ jobs:
         with:
           name: jar-${{ matrix.os }}-${{ github.run_number }}
           path: LAB_01/lab01/target/*.jar
+<<<<<<< HEAD
+          if-no-files-found: error  
+=======
           if-no-files-found: error
           
+>>>>>>> b0bc3c82f04fc063188aef5d7201c0e3198fd656
