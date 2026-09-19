@@ -10,7 +10,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
+
     runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        working-directory: lab01
 
     steps:
       - uses: actions/checkout@v4
@@ -29,8 +34,9 @@ jobs:
         if: runner.os == 'Windows'
         run: .\mvnw.cmd -B verify
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
         with:
           name: jar-${{ matrix.os }}-${{ github.run_number }}
-          path: target/*.jar
+          path: lab01/target/*.jar
           if-no-files-found: error
