@@ -15,7 +15,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: lab01
+        working-directory: LAB_01/lab01
 
     steps:
       - uses: actions/checkout@v4
