@@ -16,4 +16,8 @@ public record ReportResult(
         int totalAttendance,
         List<String> errors
 ) {
+
+    public ReportResult {
+        errors = List.copyOf(errors);
+    }
 }
