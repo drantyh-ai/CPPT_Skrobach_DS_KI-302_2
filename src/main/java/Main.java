@@ -31,7 +31,7 @@ public final class Main {
                 }
 
                 case "--version" -> {
-                    System.out.println("version 1.0.0");
+                    System.out.println("version 2.0.0");
                     return;
                 }
 
