@@ -54,6 +54,9 @@ public final class CsvProcessor {
                 scoreAttendance.stream()
                         .mapToInt(ScoreAttendance::attendance)
                         .sum(),
+                matches.stream()
+                        .mapToInt(match -> match.homePoints() + match.awayPoints())
+                        .sum(),
                 errors
         );
     }

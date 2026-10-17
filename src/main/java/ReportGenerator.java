@@ -55,6 +55,11 @@ public final class ReportGenerator {
                         .formatted(result.totalAttendance())
         );
 
+        report.append(
+                "Сумарна кількість очок: %d%n"
+                        .formatted(result.totalPoints())
+        );
+
         report.append(System.lineSeparator());
         report.append("Помилки:")
                 .append(System.lineSeparator());

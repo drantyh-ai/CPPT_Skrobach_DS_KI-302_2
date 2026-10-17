@@ -15,6 +15,7 @@ class ReportGeneratorTest {
                 8,
                 12500,
                 31200,
+                9,
                 List.of()
         );
 
@@ -30,6 +31,7 @@ class ReportGeneratorTest {
     @Test
     void shouldShowErrorsInReport() {
         ReportResult result = new ReportResult(
+                0,
                 0,
                 0,
                 0,
@@ -51,6 +53,7 @@ class ReportGeneratorTest {
     @Test
     void shouldHandleZeroValidRecords() {
         ReportResult result = new ReportResult(
+                0,
                 0,
                 0,
                 0,

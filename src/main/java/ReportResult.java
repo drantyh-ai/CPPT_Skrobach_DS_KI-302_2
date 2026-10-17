@@ -7,6 +7,7 @@ import java.util.List;
  * @param totalGoals сумарна кількість голів
  * @param maxAttendance найбільша відвідуваність
  * @param totalAttendance сумарна відвідуваність
+ * @param totalPoints сумарна кількість нарахованих очок
  * @param errors список помилок
  */
 public record ReportResult(
@@ -14,6 +15,7 @@ public record ReportResult(
         int totalGoals,
         int maxAttendance,
         int totalAttendance,
+        int totalPoints,
         List<String> errors
 ) {
 

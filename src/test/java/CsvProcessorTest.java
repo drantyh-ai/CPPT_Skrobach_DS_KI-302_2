@@ -22,6 +22,7 @@ class CsvProcessorTest {
         assertEquals(8, result.totalGoals());
         assertEquals(12500, result.maxAttendance());
         assertEquals(31200, result.totalAttendance());
+        assertEquals(8, result.totalPoints());
         assertEquals(0, result.errors().size());
     }
 
