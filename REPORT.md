@@ -89,12 +89,29 @@ java -jar target\cppt-labs.jar --input data\input.csv --output out\report.txt
 Проєкт використовує JUnit 5, SpotBugs, Maven Shade Plugin і GitHub Actions.
 CI запускає перевірку на Ubuntu, Windows і macOS та публікує JAR як artifact.
 
+Посилання:
+
+- [GitHub Actions CI run #27](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/actions/runs/39048653519)
+- [JAR artifacts для run #27](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/actions/runs/39048653519/artifacts)
+- [Репозиторій](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2)
+
 ## 11. GitHub Issues і Pull Request
 
-Історію лабораторної роботи слід вести в окремій гілці `LAB_03`.
-Рекомендовані Issues: базовий тип, підтипи й enum, рівність, тести,
-документація та CI. Pull Request має містити посилання на відповідні
-Issues і результати `verify`.
+Історію лабораторної роботи проведено в окремій гілці `LAB_03`.
+
+| Issue | Зміна |
+|---|---|
+| [#15](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/15) | Спільний базовий тип `Match` |
+| [#16](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/16) | `LeagueMatch`, `PlayoffMatch` і `MatchKind` |
+| [#17](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/17) | Поліморфна обробка матчів |
+| [#18](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/18) | `equals`, `hashCode` і `HashSet` |
+| [#21](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/21) | Тести базового типу і підтипів |
+| [#22](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/22) | README, REPORT, CI та JAR |
+
+Pull Request:
+
+- [#23 — Implement polymorphic sports league model](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/pull/23)
+- [Merge commit `4dd26ff`](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/commit/4dd26ff9ea7f30d124d7c7c1f1187cb82ba32f91)
 
 ## 12. Порівняння поведінки
 
@@ -154,9 +171,22 @@ Java-класів, тестів, Maven і документації. Остато
     Підтипи є різновидами матчу та мають однаковий спільний стан.
 15. **Як перевірено результат?**  
     Через JUnit, SpotBugs, executable JAR і порівняння контрольного звіту.
+16. **Які тести доводять коректність рівності в HashSet?**  
+    Потрібно додати два рівні об'єкти до `HashSet` і перевірити, що множина містить один елемент.
+17. **Що контролюють `sealed` і `permits`?**  
+    Вони обмежують перелік дозволених підтипів і роблять ієрархію явною.
+18. **Чому `switch` за підтипами не повинен дублювати поліморфні методи?**  
+    Таке розгалуження дублює логіку, яку вже містять перевизначені методи.
+19. **Які попередні тести та результати потрібно зберегти після перебудови?**  
+    Потрібно зберегти попередні JUnit-тести, формат CSV і контрольні показники.
+20. **Яке рішення найкраще демонструє перевагу поліморфізму?**  
+    `CsvProcessor` працює зі списком `Match` і викликає поліморфні методи без перевірки конкретного типу.
 
 ## 15. Висновки
 
 Створено поліморфну модель спортивної ліги з абстрактним базовим типом,
 двома підтипами, enum і узгодженою рівністю. Зовнішня поведінка попередньої
 роботи збережена, а модель підготовлена до подальшого розширення.
+
+Версія лабораторної роботи: `3.0.0`.  
+Git-тег: [v3.0.0](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/tree/v3.0.0).

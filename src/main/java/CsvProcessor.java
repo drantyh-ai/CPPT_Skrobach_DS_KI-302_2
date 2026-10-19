@@ -45,17 +45,18 @@ public final class CsvProcessor {
         return new ReportResult(
                 matches.size(),
                 scoreAttendance.stream()
-                        .mapToInt(ScoreAttendance::score)
+                        .mapToLong(ScoreAttendance::score)
                         .sum(),
                 scoreAttendance.stream()
                         .mapToInt(ScoreAttendance::attendance)
                         .max()
                         .orElse(0),
                 scoreAttendance.stream()
-                        .mapToInt(ScoreAttendance::attendance)
+                        .mapToLong(ScoreAttendance::attendance)
                         .sum(),
                 matches.stream()
-                        .mapToInt(match -> match.homePoints() + match.awayPoints())
+                        .mapToLong(match -> (long) match.homePoints()
+                                + match.awayPoints())
                         .sum(),
                 errors
         );

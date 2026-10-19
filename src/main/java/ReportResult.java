@@ -12,10 +12,10 @@ import java.util.List;
  */
 public record ReportResult(
         int validCount,
-        int totalGoals,
+        long totalGoals,
         int maxAttendance,
-        int totalAttendance,
-        int totalPoints,
+        long totalAttendance,
+        long totalPoints,
         List<String> errors
 ) {
 
