@@ -83,4 +83,17 @@ class CsvProcessorTest {
         assertEquals(0, result.validCount());
         assertEquals(1, result.errors().size());
     }
+
+    @Test
+    void shouldAggregateLargeValuesWithoutIntegerOverflow() {
+        List<String> lines = List.of(
+                "Динамо;Шахтар;2147483647;2147483647;2147483647",
+                "Карпати;Зоря;2147483647;2147483647;2147483647"
+        );
+
+        ReportResult result = CsvProcessor.processLines(lines);
+
+        assertEquals(8_589_934_588L, result.totalGoals());
+        assertEquals(4_294_967_294L, result.totalAttendance());
+    }
 }

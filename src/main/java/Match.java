@@ -190,7 +190,10 @@ public abstract class Match {
 
     /** @return загальний рахунок і відвідуваність */
     public final ScoreAttendance scoreAttendance() {
-        return new ScoreAttendance(homeScore + awayScore, attendance);
+        return new ScoreAttendance(
+                (long) homeScore + awayScore,
+                attendance
+        );
     }
 
     @Override

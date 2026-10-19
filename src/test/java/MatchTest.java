@@ -66,6 +66,19 @@ class MatchTest {
     }
 
     @Test
+    void shouldCalculateTotalGoalsWithoutIntegerOverflow() {
+        Match match = new LeagueMatch(
+                "Динамо",
+                "Шахтар",
+                Integer.MAX_VALUE,
+                Integer.MAX_VALUE,
+                0
+        );
+
+        assertEquals(4_294_967_294L, match.scoreAttendance().score());
+    }
+
+    @Test
     void shouldKeepScoreAttendanceAsValue() {
         ScoreAttendance first = new ScoreAttendance(3, 12500);
         ScoreAttendance second = new ScoreAttendance(3, 12500);

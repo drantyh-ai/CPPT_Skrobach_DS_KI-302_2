@@ -4,7 +4,7 @@
  * @param score загальна кількість голів у матчі
  * @param attendance відвідуваність матчу
  */
-public record ScoreAttendance(int score, int attendance) {
+public record ScoreAttendance(long score, int attendance) {
 
     public ScoreAttendance {
         if (score < 0 || attendance < 0) {
