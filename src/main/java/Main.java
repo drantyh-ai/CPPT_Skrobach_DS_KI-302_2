@@ -1,4 +1,7 @@
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +23,8 @@ public final class Main {
      * @param args аргументи командного рядка
      */
     public static void main(String[] args) {
+        configureConsoleEncoding();
+
         Path input = Path.of("data", "input.csv");
         Path output = Path.of("out", "report.txt");
 
@@ -79,7 +84,8 @@ public final class Main {
             String report =
                     ReportGenerator.createReport(result);
 
-            System.out.println(report);
+            System.out.print(report);
+            System.out.println();
 
             Path outputParent = output.getParent();
 
@@ -111,7 +117,7 @@ public final class Main {
     private static void printHelp() {
         System.out.println("""
                 Використання:
-                java -jar lab01.jar [--help] [--version]
+                java -jar target/cppt-labs.jar [--help] [--version]
                     [--input <файл>] [--output <файл>]
 
                 --help              показати довідку
@@ -119,5 +125,45 @@ public final class Main {
                 --input <файл>      шлях до вхідного CSV-файла
                 --output <файл>     шлях до файла звіту
                 """);
+    }
+
+    /**
+     * Встановлює UTF-8 для виводу українського тексту в консоль Windows.
+     */
+    private static void configureConsoleEncoding() {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            try {
+                Process process = new ProcessBuilder(
+                        "cmd.exe",
+                        "/c",
+                        "chcp 65001 > nul"
+                ).inheritIO().start();
+
+                if (process.waitFor() != 0) {
+                    throw new IllegalStateException(
+                            "Не вдалося встановити кодову сторінку UTF-8."
+                    );
+                }
+            } catch (IOException exception) {
+                throw new IllegalStateException(
+                        "Не вдалося налаштувати кодування консолі.",
+                        exception
+                );
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException(
+                        "Налаштування кодування консолі перервано.",
+                        exception
+                );
+            }
+        }
+
+        System.setOut(
+                new PrintStream(
+                        new FileOutputStream(FileDescriptor.out),
+                        true,
+                        StandardCharsets.UTF_8
+                )
+        );
     }
 }
