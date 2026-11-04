@@ -244,7 +244,7 @@ https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/actions/workflows/ci.yml
 
 ## Версія
 
-Поточна версія: `3.0.0`
+Поточна версія: `3.0.1`
 
 ## Документація
 
