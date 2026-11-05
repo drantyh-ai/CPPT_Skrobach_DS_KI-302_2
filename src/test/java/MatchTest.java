@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,7 +32,7 @@ class MatchTest {
                 () -> Match.fromCsv("Динамо;Шахтар;2;1")
         );
 
-        assertTrue(exception.getMessage().contains("очікується 5 або 6 полів"));
+        assertTrue(exception.getMessage().contains("очікується 5, 6 або 8 полів"));
     }
 
     @Test
@@ -113,6 +114,17 @@ class MatchTest {
         Match playoffDraw = Match.fromCsv("Карпати;Зоря;1;1;8500;PLAYOFF");
         assertEquals(0, playoffDraw.homePoints());
         assertEquals(0, playoffDraw.awayPoints());
+    }
+
+    @Test
+    void shouldReadLabFourDateRoundAndKindFromCsv() {
+        Match match = Match.fromCsv(
+                "Динамо;Шахтар;2026-03-10;2;1;7;12500;PLAYOFF"
+        );
+
+        assertEquals(LocalDate.of(2026, 3, 10), match.matchDate());
+        assertEquals(7, match.round());
+        assertEquals(MatchKind.PLAYOFF, match.kind());
     }
 
     @Test
