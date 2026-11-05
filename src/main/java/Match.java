@@ -1,5 +1,6 @@
 import java.util.Locale;
 import java.util.Objects;
+import java.time.LocalDate;
 
 /**
  * Спільний тип матчів спортивної ліги.
@@ -12,6 +13,8 @@ public abstract class Match {
     private final int awayScore;
     private final int attendance;
     private final MatchKind kind;
+    private final LocalDate matchDate;
+    private final int round;
 
     /**
      * Створює матч із перевіреними спільними полями.
@@ -37,6 +40,28 @@ public abstract class Match {
                 validateNonNegative(homeScore, "рахунок"),
                 validateNonNegative(awayScore, "рахунок"),
                 validateNonNegative(attendance, "відвідуваність"),
+                LocalDate.of(1970, 1, 1), 0, validateKind(kind), true
+        );
+    }
+
+    protected Match(
+            String homeTeam,
+            String awayTeam,
+            int homeScore,
+            int awayScore,
+            int attendance,
+            LocalDate matchDate,
+            int round,
+            MatchKind kind
+    ) {
+        this(
+                validateTeam(homeTeam),
+                validateTeam(awayTeam),
+                validateNonNegative(homeScore, "рахунок"),
+                validateNonNegative(awayScore, "рахунок"),
+                validateNonNegative(attendance, "відвідуваність"),
+                Objects.requireNonNull(matchDate, "Дата матчу не може бути null."),
+                validateNonNegative(round, "тур"),
                 validateKind(kind),
                 true
         );
@@ -48,6 +73,8 @@ public abstract class Match {
             int homeScore,
             int awayScore,
             int attendance,
+            LocalDate matchDate,
+            int round,
             MatchKind kind,
             boolean validated
     ) {
@@ -56,6 +83,8 @@ public abstract class Match {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.attendance = attendance;
+        this.matchDate = matchDate;
+        this.round = round;
         this.kind = kind;
     }
 
@@ -88,9 +117,10 @@ public abstract class Match {
      *
      * <p>П'ять полів зберігають формат лабораторної роботи №2
      * і трактуються як ліговий матч. Шосте поле може містити
-     * {@code LEAGUE} або {@code PLAYOFF}.</p>
+     * {@code LEAGUE} або {@code PLAYOFF}. Вісім полів додають дату,
+     * тур і відвідуваність для потокових запитів лабораторної №4.</p>
      *
-     * @param line рядок у форматі home;away;homeScore;awayScore;attendance[;kind]
+     * @param line рядок у форматі старого або розширеного CSV
      * @return створений матч
      * @throws IllegalArgumentException якщо формат або значення хибні
      */
@@ -100,36 +130,56 @@ public abstract class Match {
         }
 
         String[] fields = line.split(";", -1);
-        if (fields.length != 5 && fields.length != 6) {
+        if (fields.length != 5 && fields.length != 6 && fields.length != 8) {
             throw new IllegalArgumentException(
-                    "очікується 5 або 6 полів, отримано " + fields.length + "."
+                    "очікується 5, 6 або 8 полів, отримано "
+                            + fields.length + "."
             );
         }
 
         final int homeScore;
         final int awayScore;
         final int attendance;
+        final LocalDate matchDate;
+        final int round;
         try {
-            homeScore = Integer.parseInt(fields[2]);
-            awayScore = Integer.parseInt(fields[3]);
-            attendance = Integer.parseInt(fields[4]);
+            if (fields.length == 8) {
+                matchDate = LocalDate.parse(fields[2]);
+                homeScore = Integer.parseInt(fields[3]);
+                awayScore = Integer.parseInt(fields[4]);
+                round = Integer.parseInt(fields[5]);
+                attendance = Integer.parseInt(fields[6]);
+            } else {
+                matchDate = LocalDate.of(1970, 1, 1);
+                round = 0;
+                homeScore = Integer.parseInt(fields[2]);
+                awayScore = Integer.parseInt(fields[3]);
+                attendance = Integer.parseInt(fields[4]);
+            }
         } catch (NumberFormatException exception) {
             throw new IllegalArgumentException(
                     "числове поле має неправильний формат.",
+                    exception
+            );
+        } catch (java.time.format.DateTimeParseException exception) {
+            throw new IllegalArgumentException(
+                    "дата матчу має неправильний формат YYYY-MM-DD.",
                     exception
             );
         }
 
         MatchKind kind = fields.length == 5
                 ? MatchKind.LEAGUE
-                : parseKind(fields[5]);
+                : parseKind(fields.length == 6 ? fields[5] : fields[7]);
 
         return kind == MatchKind.LEAGUE
                 ? new LeagueMatch(
-                        fields[0], fields[1], homeScore, awayScore, attendance
+                        fields[0], fields[1], homeScore, awayScore, attendance,
+                        matchDate, round
                 )
                 : new PlayoffMatch(
-                        fields[0], fields[1], homeScore, awayScore, attendance
+                        fields[0], fields[1], homeScore, awayScore, attendance,
+                        matchDate, round
                 );
     }
 
@@ -174,6 +224,21 @@ public abstract class Match {
         return kind;
     }
 
+    /** @return дата матчу */
+    public final LocalDate matchDate() {
+        return matchDate;
+    }
+
+    /** @return номер туру */
+    public final int round() {
+        return round;
+    }
+
+    /** @return абсолютна різниця між голами команд */
+    public final int goalDifference() {
+        return Math.abs(homeScore - awayScore);
+    }
+
     /**
      * Обчислює очки господарів за правилами підтипу.
      *
@@ -208,14 +273,17 @@ public abstract class Match {
         return homeScore == match.homeScore
                 && awayScore == match.awayScore
                 && attendance == match.attendance
+                && round == match.round
                 && homeTeam.equals(match.homeTeam)
-                && awayTeam.equals(match.awayTeam);
+                && awayTeam.equals(match.awayTeam)
+                && matchDate.equals(match.matchDate);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                getClass(), homeTeam, awayTeam, homeScore, awayScore, attendance
+                getClass(), homeTeam, awayTeam, homeScore, awayScore, attendance,
+                matchDate, round
         );
     }
 

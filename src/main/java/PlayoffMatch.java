@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 /**
  * Матч плей-оф.
  *
@@ -26,6 +28,32 @@ public final class PlayoffMatch extends Match {
         super(
                 homeTeam, awayTeam, homeScore, awayScore, attendance,
                 MatchKind.PLAYOFF
+        );
+    }
+
+    /**
+     * Створює матч плей-оф із датою та номером туру.
+     *
+     * @param homeTeam домашня команда
+     * @param awayTeam гостьова команда
+     * @param homeScore рахунок домашньої команди
+     * @param awayScore рахунок гостьової команди
+     * @param attendance відвідуваність
+     * @param matchDate дата матчу
+     * @param round номер туру
+     */
+    public PlayoffMatch(
+            String homeTeam,
+            String awayTeam,
+            int homeScore,
+            int awayScore,
+            int attendance,
+            LocalDate matchDate,
+            int round
+    ) {
+        super(
+                homeTeam, awayTeam, homeScore, awayScore, attendance,
+                matchDate, round, MatchKind.PLAYOFF
         );
     }
 
