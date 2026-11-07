@@ -1,5 +1,5 @@
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Клас для обробки даних спортивної ліги.
@@ -16,27 +16,22 @@ public final class CsvProcessor {
      * @return результати обробки
      */
     public static ReportResult processLines(List<String> lines) {
-        List<String> errors = new ArrayList<>();
-        List<Match> matches = new ArrayList<>();
+        List<ProcessingResult> processingResults =
+                IntStream.range(0, lines.size())
+                        .mapToObj(index -> processLine(index + 1, lines.get(index)))
+                        .toList();
 
-        for (int index = 0; index < lines.size(); index++) {
-            int lineNumber = index + 1;
-            String line = lines.get(index);
+        List<Match> matches = processingResults.stream()
+                .map(ProcessingResult::match)
+                .map(java.util.Optional::ofNullable)
+                .flatMap(java.util.Optional::stream)
+                .toList();
 
-            if (line.isBlank()) {
-                errors.add("Рядок " + lineNumber + ": порожній рядок.");
-                continue;
-            }
-
-            try {
-                matches.add(Match.fromCsv(line));
-            } catch (IllegalArgumentException exception) {
-                errors.add(
-                        "Рядок " + lineNumber + ": "
-                                + exception.getMessage()
-                );
-            }
-        }
+        List<String> errors = processingResults.stream()
+                .map(ProcessingResult::error)
+                .map(java.util.Optional::ofNullable)
+                .flatMap(java.util.Optional::stream)
+                .toList();
 
         List<ScoreAttendance> scoreAttendance = matches.stream()
                 .map(Match::scoreAttendance)
@@ -60,5 +55,27 @@ public final class CsvProcessor {
                         .sum(),
                 errors
         );
+    }
+
+    private static ProcessingResult processLine(int lineNumber, String line) {
+        if (line.isBlank()) {
+            return new ProcessingResult(
+                    null,
+                    "Рядок " + lineNumber + ": порожній рядок."
+            );
+        }
+
+        try {
+            return new ProcessingResult(Match.fromCsv(line), null);
+        } catch (IllegalArgumentException exception) {
+            return new ProcessingResult(
+                    null,
+                    "Рядок " + lineNumber + ": "
+                            + exception.getMessage()
+            );
+        }
+    }
+
+    private record ProcessingResult(Match match, String error) {
     }
 }

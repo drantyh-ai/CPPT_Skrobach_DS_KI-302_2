@@ -68,10 +68,9 @@ public final class ReportGenerator {
             report.append("Немає помилок.")
                     .append(System.lineSeparator());
         } else {
-            for (String error : result.errors()) {
-                report.append(error)
-                        .append(System.lineSeparator());
-            }
+            result.errors().stream()
+                    .forEach(error -> report.append(error)
+                            .append(System.lineSeparator()));
         }
 
         return report.toString();

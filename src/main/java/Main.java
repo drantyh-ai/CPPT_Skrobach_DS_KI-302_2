@@ -5,7 +5,9 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Головний клас програми.
@@ -25,88 +27,64 @@ public final class Main {
     public static void main(String[] args) {
         configureConsoleEncoding();
 
-        Path input = Path.of("data", "input.csv");
-        Path output = Path.of("out", "report.txt");
+        CommandLineOptions options = new CommandLineOptions();
+        Arrays.stream(args).forEach(options::accept);
 
-        for (int i = 0; i < args.length; i++) {
-            switch (args[i]) {
-                case "--help" -> {
-                    printHelp();
-                    return;
-                }
-
-                case "--version" -> {
-                    System.out.println("version 4.0.0");
-                    return;
-                }
-
-                case "--input" -> {
-                    if (i + 1 >= args.length) {
-                        System.out.println(
-                                "Помилка: після --input потрібно "
-                                        + "вказати шлях."
-                        );
-                        return;
-                    }
-
-                    input = Path.of(args[++i]);
-                }
-
-                case "--output" -> {
-                    if (i + 1 >= args.length) {
-                        System.out.println(
-                                "Помилка: після --output потрібно "
-                                        + "вказати шлях."
-                        );
-                        return;
-                    }
-
-                    output = Path.of(args[++i]);
-                }
-
-                default -> {
-                    System.out.println(
-                            "Невідомий аргумент: " + args[i]
-                    );
-                    System.out.println("Використайте --help.");
-                    return;
-                }
+        if (options.shouldStop()) {
+            if (options.helpRequested()) {
+                printHelp();
+            } else if (options.versionRequested()) {
+                System.out.println("version " + applicationVersion());
+            } else {
+                System.out.println(options.errorMessage());
+                System.out.println("Використайте --help.");
             }
+            return;
         }
 
         try {
             List<String> lines =
-                    Files.readAllLines(input, StandardCharsets.UTF_8);
-
-            ReportResult result =
-                    CsvProcessor.processLines(lines);
-
-            String report =
-                    ReportGenerator.createReport(result);
+                    Files.readAllLines(options.input(), StandardCharsets.UTF_8);
+            ReportResult result = CsvProcessor.processLines(lines);
+            String report = ReportGenerator.createReport(result);
 
             System.out.print(report);
             System.out.println();
 
-            Path outputParent = output.getParent();
-
+            Path outputParent = options.output().getParent();
             if (outputParent != null) {
                 Files.createDirectories(outputParent);
             }
 
             Files.writeString(
-                    output,
+                    options.output(),
                     report,
                     StandardCharsets.UTF_8
             );
 
-            System.out.println(
-                    "Звіт записано у: " + output
-            );
-
+            System.out.println("Звіт записано у: " + options.output());
         } catch (IOException exception) {
             System.out.println(
-                    "Помилка роботи з файлом: "
-                            + exception.getMessage()
+                    "Помилка роботи з файлом: " + exception.getMessage()
+            );
+        }
+    }
+
+    private static String applicationVersion() {
+        Properties properties = new Properties();
+        try (var stream = Main.class.getClassLoader()
+                .getResourceAsStream("version.properties")) {
+            if (stream == null) {
+                throw new IllegalStateException(
+                        "Ресурс версії не знайдено."
+                );
+            }
+            properties.load(stream);
+            return properties.getProperty("app.version");
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                    "Не вдалося прочитати версію програми.",
+                    exception
             );
         }
     }
@@ -134,11 +112,8 @@ public final class Main {
         if (System.getProperty("os.name").startsWith("Windows")) {
             try {
                 Process process = new ProcessBuilder(
-                        "cmd.exe",
-                        "/c",
-                        "chcp 65001 > nul"
+                        "cmd.exe", "/c", "chcp 65001 > nul"
                 ).inheritIO().start();
-
                 if (process.waitFor() != 0) {
                     throw new IllegalStateException(
                             "Не вдалося встановити кодову сторінку UTF-8."
@@ -165,5 +140,69 @@ public final class Main {
                         StandardCharsets.UTF_8
                 )
         );
+    }
+
+    private static final class CommandLineOptions {
+        private Path input = Path.of("data", "input.csv");
+        private Path output = Path.of("out", "report.txt");
+        private String pendingOption;
+        private String errorMessage;
+        private boolean helpRequested;
+        private boolean versionRequested;
+
+        private void accept(String argument) {
+            if (errorMessage != null || helpRequested || versionRequested) {
+                return;
+            }
+
+            if (pendingOption != null) {
+                setPath(argument);
+                pendingOption = null;
+                return;
+            }
+
+            switch (argument) {
+                case "--help" -> helpRequested = true;
+                case "--version" -> versionRequested = true;
+                case "--input", "--output" -> pendingOption = argument;
+                default -> errorMessage = "Невідомий аргумент: " + argument;
+            }
+        }
+
+        private void setPath(String value) {
+            if ("--input".equals(pendingOption)) {
+                input = Path.of(value);
+            } else {
+                output = Path.of(value);
+            }
+        }
+
+        private boolean shouldStop() {
+            if (pendingOption != null && errorMessage == null) {
+                errorMessage = "Помилка: після " + pendingOption
+                        + " потрібно вказати шлях.";
+            }
+            return helpRequested || versionRequested || errorMessage != null;
+        }
+
+        private boolean helpRequested() {
+            return helpRequested;
+        }
+
+        private boolean versionRequested() {
+            return versionRequested;
+        }
+
+        private String errorMessage() {
+            return errorMessage;
+        }
+
+        private Path input() {
+            return input;
+        }
+
+        private Path output() {
+            return output;
+        }
     }
 }
