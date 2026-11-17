@@ -117,6 +117,16 @@ class MatchTest {
     }
 
     @Test
+    void shouldRejectUnknownMatchKind() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> Match.fromCsv(
+                        "Карпати;Зоря;1;0;8500;UNKNOWN"
+                )
+        );
+    }
+
+    @Test
     void shouldReadLabFourDateRoundAndKindFromCsv() {
         Match match = Match.fromCsv(
                 "Динамо;Шахтар;2026-03-10;2;1;7;12500;PLAYOFF"

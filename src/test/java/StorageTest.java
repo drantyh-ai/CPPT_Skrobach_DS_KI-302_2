@@ -57,6 +57,37 @@ class StorageTest {
     }
 
     @Test
+    void exporterWritesHeaderForEmptyInputAndUsesPlatformSeparator()
+            throws Exception {
+        Path path = temporaryDirectory.resolve("empty.csv");
+
+        CsvExporter.write(path, MatchRecord.class, List.of());
+        String csv = Files.readString(path, StandardCharsets.UTF_8);
+
+        assertEquals(
+                "господарі,гості,дата,рахунок господарів,рахунок гостей,тур"
+                        + System.lineSeparator(),
+                csv);
+        assertEquals(1, CsvParser.parseDocument(csv).size());
+        assertTrue(csv.endsWith(System.lineSeparator()));
+    }
+
+    @Test
+    void rejectsWrongFieldCountAndInvalidNumber() {
+        DataStorageException wrongCount = assertThrows(
+                DataStorageException.class,
+                () -> MatchRecord.fromFields(List.of(
+                        "Динамо", "Шахтар", "2026-03-10")));
+        DataStorageException invalidNumber = assertThrows(
+                DataStorageException.class,
+                () -> MatchRecord.fromCsv(
+                        "Динамо,Шахтар,2026-03-10,not-a-number,0,1"));
+
+        assertTrue(wrongCount.getMessage().contains("6 CSV-полів"));
+        assertTrue(invalidNumber.getCause() instanceof NumberFormatException);
+    }
+
+    @Test
     void invalidRecordRetainsCause() {
         DataStorageException exception = assertThrows(
                 DataStorageException.class,

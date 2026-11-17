@@ -6,7 +6,13 @@ public final class CsvParser {
     private CsvParser() {
     }
 
-    /** Розбирає один CSV-запис. */
+    /**
+     * Розбирає один CSV-запис.
+     *
+     * @param text CSV-запис
+     * @return незмінний список полів
+     * @throws DataStorageException якщо екранування некоректне
+     */
     public static List<String> parse(String text) throws DataStorageException {
         if (text == null) {
             throw new DataStorageException("CSV-запис не може бути null.");
@@ -16,6 +22,10 @@ public final class CsvParser {
 
     /**
      * Розбирає весь документ, не вважаючи перенос рядка в лапках межею запису.
+     *
+     * @param document повний CSV-документ
+     * @return незмінний список записів
+     * @throws DataStorageException якщо документ має некоректне екранування
      */
     public static List<List<String>> parseDocument(String document)
             throws DataStorageException {
