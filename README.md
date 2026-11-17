@@ -305,4 +305,4 @@ https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/actions/workflows/ci.yml
 mvnw.cmd -B clean verify
 ```
 
-Очікуваний результат: 34 тести пройшли, SpotBugs не виявив помилок.
+Очікуваний результат: 37 тестів пройшли, SpotBugs не виявив помилок.

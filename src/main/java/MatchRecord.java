@@ -34,13 +34,25 @@ public final class MatchRecord {
         this.round = validateNonNegative(round, "Тур");
     }
 
-    /** Відновлює запис з одного CSV-рядка. */
+    /**
+     * Відновлює запис з одного CSV-рядка.
+     *
+     * @param line CSV-рядок у форматі MatchRecord
+     * @return відновлений запис
+     * @throws DataStorageException якщо рядок має неправильний формат
+     */
     public static MatchRecord fromCsv(String line)
             throws DataStorageException {
         return fromFields(CsvParser.parse(line));
     }
 
-    /** Відновлює запис із полів у порядку CSV. */
+    /**
+     * Відновлює запис із полів у порядку CSV.
+     *
+     * @param fields поля в порядку CSV-заголовка
+     * @return відновлений запис
+     * @throws DataStorageException якщо кількість або значення полів хибні
+     */
     public static MatchRecord fromFields(List<String> fields)
             throws DataStorageException {
         if (fields.size() != 6) {
@@ -63,7 +75,13 @@ public final class MatchRecord {
         }
     }
 
-    /** Читає CSV-файл разом із заголовком і відновлює записи. */
+    /**
+     * Читає CSV-файл разом із заголовком і відновлює записи.
+     *
+     * @param path шлях до CSV-файла
+     * @return відновлені записи
+     * @throws DataStorageException якщо файл або запис неможливо прочитати
+     */
     public static List<MatchRecord> readAll(java.nio.file.Path path)
             throws DataStorageException {
         try {
@@ -94,26 +112,32 @@ public final class MatchRecord {
         }
     }
 
+    /** @return назва команди господарів */
     public String homeTeam() {
         return homeTeam;
     }
 
+    /** @return назва команди гостей */
     public String awayTeam() {
         return awayTeam;
     }
 
+    /** @return дата матчу */
     public LocalDate date() {
         return date;
     }
 
+    /** @return рахунок команди господарів */
     public int homeScore() {
         return homeScore;
     }
 
+    /** @return рахунок команди гостей */
     public int awayScore() {
         return awayScore;
     }
 
+    /** @return номер туру */
     public int round() {
         return round;
     }

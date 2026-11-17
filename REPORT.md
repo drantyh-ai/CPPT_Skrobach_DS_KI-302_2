@@ -207,14 +207,21 @@ CSV-файл лише із заголовком також не створює �
 - екранування коми та лапок;
 - перенесення рядка всередині лапок;
 - round-trip для `MatchRecord`;
+- порожній експорт із заголовком;
+- платформний `System.lineSeparator()`;
+- неправильну кількість CSV-полів;
+- неправильне число;
 - неправильну дату;
 - відсутній файл;
 - збереження першопричини через `getCause()`.
 
-Разом із попередніми тестами виконано **34 тести**:
+У попередніх тестах також перевіряється неправильне значення категорії
+матчу (`enum MatchKind`).
 
-- 29 тестів попередніх робіт;
-- 5 тестів лабораторної роботи №5.
+Разом із попередніми тестами виконано **37 тестів**:
+
+- 30 тестів попередніх робіт;
+- 7 тестів лабораторної роботи №5.
 
 Результат: усі тести пройшли успішно.
 
@@ -229,7 +236,7 @@ CSV-файл лише із заголовком також не створює �
 Результат:
 
 - компіляція Java 21 успішна;
-- 34 тести пройшли;
+- 37 тестів пройшли;
 - SpotBugs не виявив помилок;
 - executable JAR створено;
 - версія JAR: `5.0.0`.
@@ -246,6 +253,10 @@ java -jar target\cppt-labs.jar --version
 version 5.0.0
 ```
 
+Git-тег версії:
+
+- [v5.0.0 — Git tag](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/tree/v5.0.0)
+
 ## 13. GitHub Issues і Pull Request
 
 Для лабораторної роботи №5 зміни логічно поділяються на такі задачі:
@@ -256,10 +267,16 @@ version 5.0.0
 | [#37](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/37) | Метадані | `@CsvColumn` | перевірка runtime-анотацій |
 | [#38](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/38) | Експорт | `CsvExporter` | заголовок, UTF-8, екранування |
 | [#39](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/39) | Парсер та імпорт | `CsvParser`, `MatchRecord.readAll` | коми, лапки, перенесення, відновлення |
-| [#40](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/40) | Тестування | round-trip і помилки | 34 тести, перевірка `cause` |
+| [#40](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/40) | Тестування | round-trip і помилки | 37 тестів, перевірка `cause` |
 
 Усі п'ять Issues створені з префіксом `[Lab 5]` і відповідають окремим
 частинам реалізації лабораторної роботи.
+
+Pull Request лабораторної роботи:
+
+- [#42 — [Lab 5] Add generic repository and reflective CSV round-trip](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/pull/42)
+
+Pull Request об'єднано до основної гілки.
 
 ## 14. Порівняння стану проєкту
 
