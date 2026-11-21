@@ -42,7 +42,7 @@ class StorageTest {
 
         assertTrue(csv.contains("\"Динамо, \"\"старе\"\"\""));
         assertTrue(csv.startsWith(
-                "господарі,гості,дата,рахунок господарів,рахунок гостей,тур"
+                "рахунок гостей,гості,дата,рахунок господарів,господарі,тур"
                         + System.lineSeparator()));
         assertEquals(original, restored);
     }
@@ -65,7 +65,7 @@ class StorageTest {
         String csv = Files.readString(path, StandardCharsets.UTF_8);
 
         assertEquals(
-                "господарі,гості,дата,рахунок господарів,рахунок гостей,тур"
+                "рахунок гостей,гості,дата,рахунок господарів,господарі,тур"
                         + System.lineSeparator(),
                 csv);
         assertEquals(1, CsvParser.parseDocument(csv).size());
@@ -73,18 +73,23 @@ class StorageTest {
     }
 
     @Test
-    void rejectsWrongFieldCountAndInvalidNumber() {
-        DataStorageException wrongCount = assertThrows(
+    void rejectsWrongFieldCount() {
+        DataStorageException exception = assertThrows(
                 DataStorageException.class,
                 () -> MatchRecord.fromFields(List.of(
                         "Динамо", "Шахтар", "2026-03-10")));
-        DataStorageException invalidNumber = assertThrows(
+
+        assertTrue(exception.getMessage().contains("6 CSV-полів"));
+    }
+
+    @Test
+    void rejectsInvalidNumber() {
+        DataStorageException exception = assertThrows(
                 DataStorageException.class,
                 () -> MatchRecord.fromCsv(
                         "Динамо,Шахтар,2026-03-10,not-a-number,0,1"));
 
-        assertTrue(wrongCount.getMessage().contains("6 CSV-полів"));
-        assertTrue(invalidNumber.getCause() instanceof NumberFormatException);
+        assertTrue(exception.getCause() instanceof NumberFormatException);
     }
 
     @Test

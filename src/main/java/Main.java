@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -63,7 +64,49 @@ public final class Main {
             );
 
             System.out.println("Звіт записано у: " + options.output());
-        } catch (IOException exception) {
+
+            if (options.importMatches() != null) {
+                List<MatchRecord> imported =
+                        MatchRecord.readAll(options.importMatches());
+                System.out.println(
+                        "Імпортовано записів: " + imported.size()
+                );
+            }
+
+            if (options.exportMatches() != null) {
+                Repository<MatchRecord> repository = new Repository<>();
+                for (String line : lines) {
+                    if (line.isBlank()) {
+                        continue;
+                    }
+                    try {
+                        Match match = Match.fromCsv(line);
+                        repository.add(new MatchRecord(
+                                match.homeTeam(),
+                                match.awayTeam(),
+                                match.matchDate(),
+                                match.homeScore(),
+                                match.awayScore(),
+                                match.round()
+                        ));
+                    } catch (IllegalArgumentException exception) {
+                        // Некоректні рядки попереднього CSV пропускаються,
+                        // як і під час формування звіту.
+                    }
+                }
+                CsvExporter.write(
+                        options.exportMatches(),
+                        MatchRecord.class,
+                        repository.all()
+                );
+                System.out.println(
+                        "Експортовано записів: " + repository.all().size()
+                );
+                System.out.println(
+                        "CSV записано у: " + options.exportMatches()
+                );
+            }
+        } catch (IOException | DataStorageException exception) {
             System.out.println(
                     "Помилка роботи з файлом: " + exception.getMessage()
             );
@@ -97,11 +140,14 @@ public final class Main {
                 Використання:
                 java -jar target/cppt-labs.jar [--help] [--version]
                     [--input <файл>] [--output <файл>]
+                    [--export-matches <файл>] [--import-matches <файл>]
 
-                --help              показати довідку
-                --version           показати версію програми
-                --input <файл>      шлях до вхідного CSV-файла
-                --output <файл>     шлях до файла звіту
+                --help                    показати довідку
+                --version                 показати версію програми
+                --input <файл>            шлях до попереднього CSV-файла
+                --output <файл>           шлях до файла текстового звіту
+                --export-matches <файл>   експортувати MatchRecord у CSV
+                --import-matches <файл>   імпортувати MatchRecord із CSV
                 """);
     }
 
@@ -145,6 +191,8 @@ public final class Main {
     private static final class CommandLineOptions {
         private Path input = Path.of("data", "input.csv");
         private Path output = Path.of("out", "report.txt");
+        private Path exportMatches;
+        private Path importMatches;
         private String pendingOption;
         private String errorMessage;
         private boolean helpRequested;
@@ -164,16 +212,20 @@ public final class Main {
             switch (argument) {
                 case "--help" -> helpRequested = true;
                 case "--version" -> versionRequested = true;
-                case "--input", "--output" -> pendingOption = argument;
+                case "--input", "--output", "--export-matches",
+                        "--import-matches" -> pendingOption = argument;
                 default -> errorMessage = "Невідомий аргумент: " + argument;
             }
         }
 
         private void setPath(String value) {
-            if ("--input".equals(pendingOption)) {
-                input = Path.of(value);
-            } else {
-                output = Path.of(value);
+            switch (pendingOption) {
+                case "--input" -> input = Path.of(value);
+                case "--output" -> output = Path.of(value);
+                case "--export-matches" -> exportMatches = Path.of(value);
+                case "--import-matches" -> importMatches = Path.of(value);
+                default -> throw new IllegalStateException(
+                        "Невідома опція шляху: " + pendingOption);
             }
         }
 
@@ -203,6 +255,14 @@ public final class Main {
 
         private Path output() {
             return output;
+        }
+
+        private Path exportMatches() {
+            return exportMatches;
+        }
+
+        private Path importMatches() {
+            return importMatches;
         }
     }
 }
