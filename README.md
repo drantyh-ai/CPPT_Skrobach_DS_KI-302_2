@@ -6,7 +6,7 @@
 **Варіант:** 17 — спортивна ліга
 **Мова:** Java 21  
 **Система збірки:** Maven  
-**Версія:** 5.0.0
+**Версія:** 5.0.1
 **Операційна система розробки:** Windows
 
 ## Мета роботи
@@ -79,19 +79,21 @@ Raw types не використовуються. Внутрішній списо
 Повний заголовок:
 
 ```text
-господарі,гості,дата,рахунок господарів,рахунок гостей,тур
+рахунок гостей,гості,дата,рахунок господарів,господарі,тур
 ```
+
+Заголовок і значення впорядковуються за Java-іменем анотованого поля.
 
 Звичайний запис:
 
 ```text
-Динамо,Шахтар,2026-03-10,2,0,1
+0,Шахтар,2026-03-10,2,Динамо,1
 ```
 
 Запис із комою та лапками:
 
 ```text
-"Динамо, ""старе""",Шахтар,2026-03-10,2,0,1
+0,Шахтар,2026-03-10,2,"Динамо, ""старе""",1
 ```
 
 Значення з комою, подвійною лапкою або перенесенням рядка береться в
@@ -116,6 +118,13 @@ Raw types не використовуються. Внутрішній списо
 
 ```java
 CsvExporter.write(path, MatchRecord.class, records);
+```
+
+Експортер доступний і в командному рядку програми:
+
+```powershell
+java -jar target\cppt-labs.jar --input data\lab04_input.csv --export-matches out\matches.csv
+java -jar target\cppt-labs.jar --import-matches out\matches.csv
 ```
 
 Для порожнього списку `Class<T>` потрібен, щоб побудувати заголовок без
@@ -206,7 +215,7 @@ assertEquals(original, restored);
 Фінальний результат:
 
 ```text
-37 tests run
+38 tests run
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -243,7 +252,7 @@ java -jar target\cppt-labs.jar --version
 Очікувана версія:
 
 ```text
-version 5.0.0
+version 5.0.1
 ```
 
 ## CI та артефакти
@@ -265,7 +274,7 @@ Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) запускає
 
 ## Версія і Git
 
-- [Git tag v5.0.0](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/tree/v5.0.0)
+- [Git tag v5.0.1](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/tree/v5.0.1)
 - [Pull Request #42](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/pull/42)
 - [Issue #36 — Repository<T>](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/36)
 - [Issue #37 — CSV metadata annotation](https://github.com/drantyh-ai/CPPT_Skrobach_DS_KI-302_2/issues/37)

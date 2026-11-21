@@ -75,6 +75,28 @@ public final class MatchRecord {
         }
     }
 
+    private static MatchRecord fromExportFields(List<String> fields)
+            throws DataStorageException {
+        if (fields.size() != 6) {
+            throw new DataStorageException(
+                    "Для MatchRecord очікується 6 CSV-полів, отримано "
+                            + fields.size() + ".");
+        }
+        try {
+            return new MatchRecord(
+                    fields.get(4),
+                    fields.get(1),
+                    LocalDate.parse(fields.get(2)),
+                    Integer.parseInt(fields.get(3)),
+                    Integer.parseInt(fields.get(0)),
+                    Integer.parseInt(fields.get(5))
+            );
+        } catch (RuntimeException exception) {
+            throw new DataStorageException(
+                    "Некоректний CSV-запис матчу.", exception);
+        }
+    }
+
     /**
      * Читає CSV-файл разом із заголовком і відновлює записи.
      *
@@ -95,10 +117,18 @@ public final class MatchRecord {
                 throw new DataStorageException(
                         "Заголовок MatchRecord має містити 6 стовпців.");
             }
+            List<String> sortedHeader = List.of(
+                    "рахунок гостей", "гості", "дата",
+                    "рахунок господарів", "господарі", "тур");
+            if (!rows.get(0).equals(sortedHeader)) {
+                throw new DataStorageException(
+                        "Некоректний заголовок MatchRecord: очікується "
+                                + String.join(",", sortedHeader) + ".");
+            }
             return rows.subList(1, rows.size()).stream()
                     .map(fields -> {
                         try {
-                            return fromFields(fields);
+                            return fromExportFields(fields);
                         } catch (DataStorageException exception) {
                             throw new RecordImportException(exception);
                         }
